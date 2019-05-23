@@ -3,8 +3,8 @@ import assign from 'object-assign'
 
 let pid = 0
 
-function emitVueEvent (event) {
-  this.player.on(event, (data) => {
+function emitVueEvent(event) {
+  this.player.on(event, data => {
     this.$emit(event, data, this.player)
   })
 }
@@ -45,13 +45,15 @@ export default {
       default: false
     }
   },
-  render (h) {
-    return h('div', { attrs: { id: this.elementId } })
+  render(h) {
+    return h('div', {
+      attrs: { id: this.elementId, class: 'vimeo-player' }
+    })
   },
   watch: {
     videoId: 'update'
   },
-  data () {
+  data() {
     pid += 1
 
     return {
@@ -66,36 +68,37 @@ export default {
      * @param {Number} videoId
      * @return {LoadVideoPromise}
      */
-    update (videoId) {
+    update(videoId) {
       return this.player.loadVideo(videoId)
     },
-    play () {
+    play() {
       return this.player.play()
     },
-    pause () {
+    pause() {
       return this.player.pause()
     },
-    mute () {
+    mute() {
       return this.player.setVolume(0)
     },
-    unmute (volume = 0.5) {
+    unmute(volume = 0.5) {
       return this.player.setVolume(volume)
     },
-    setEvents () {
+    setEvents() {
       const vm = this
 
-      this.player.ready()
-        .then(function () {
+      this.player
+        .ready()
+        .then(function() {
           vm.$emit('ready', vm.player)
         })
-        .catch((error) => {
+        .catch(error => {
           vm.$emit('error', error, vm.player)
         })
 
       eventsToEmit.forEach(event => emitVueEvent.call(vm, event))
     }
   },
-  mounted () {
+  mounted() {
     const options = {
       id: this.videoId,
       width: this.playerWidth,
@@ -108,7 +111,7 @@ export default {
 
     this.setEvents()
   },
-  beforeDestroy () {
+  beforeDestroy() {
     this.player.unload()
   }
 }
